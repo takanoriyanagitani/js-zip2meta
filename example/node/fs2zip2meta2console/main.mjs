@@ -1,8 +1,8 @@
-import fs from "node:fs/promises"
+import fs from "node:fs/promises";
 
-import JSZip from "jszip"
+import JSZip from "jszip";
 
-import { bind, lift, of, zip2console, ZipMethod } from "../../../zip2meta.mjs"
+import { bind, lift, of, zip2console, ZipMethod } from "../../../zip2meta.mjs";
 
 /**
  * @import { JSZipObject } from "jszip"
@@ -19,8 +19,8 @@ import { bind, lift, of, zip2console, ZipMethod } from "../../../zip2meta.mjs"
  */
 function filename2buffer(filename) {
   return () => {
-    return fs.readFile(filename)
-  }
+    return fs.readFile(filename);
+  };
 }
 
 /**
@@ -29,7 +29,7 @@ function filename2buffer(filename) {
  * @returns {Promise<ArrayBuffer>} The converted buffer.
  */
 function buffer2abuf(buffer) {
-  return Promise.resolve(buffer.buffer)
+  return Promise.resolve(buffer.buffer);
 }
 
 /**
@@ -41,7 +41,7 @@ function filename2arrayBuffer(filename) {
   return bind(
     filename2buffer(filename),
     lift(buffer2abuf),
-  )
+  );
 }
 
 /**
@@ -54,35 +54,35 @@ function buf2zip(buf) {
   return () => {
     return JSZip.loadAsync(buf)
       .then((jz) => {
-        const fileMap = jz.files
+        const fileMap = jz.files;
         /** @type JSZipObject[] */
         const files = Object.keys(fileMap).map((key) => {
           /** @type JSZipObject */
-          const file = fileMap[key]
-          return file
-        })
+          const file = fileMap[key];
+          return file;
+        });
         /** @type ZipItemInfo[] */
         const infoArr = files.map((file) => {
           /** @type Date */
-          const date = file.date
+          const date = file.date;
 
           /** @type number */
-          const unixtimeMs = date.getTime()
+          const unixtimeMs = date.getTime();
 
           /** @type string */
-          const method = file.options.compression
+          const method = file.options.compression;
 
           /** @type number */
           const mnum = ((ms) => {
             switch (ms) {
               case "store":
-                return ZipMethod.STORE
+                return ZipMethod.STORE;
               case "deflate":
-                return ZipMethod.DEFLATE
+                return ZipMethod.DEFLATE;
               default:
-                return ZipMethod.UNSPECIFIED
+                return ZipMethod.UNSPECIFIED;
             }
-          })(method)
+          })(method);
 
           return {
             name: file.name,
@@ -91,16 +91,16 @@ function buf2zip(buf) {
             size: 0,
             method: mnum,
             isDir: file.dir,
-          }
-        })
+          };
+        });
 
         return {
           comment: "",
           filepath: "",
           items: infoArr,
-        }
-      })
-  }
+        };
+      });
+  };
 }
 
 /** @type IO<Void> */
@@ -108,25 +108,25 @@ const main = () => {
   return Promise.resolve()
     .then((_) => {
       /** @type IO<string> */
-      const filename = of("./sample.zip")
+      const filename = of("./sample.zip");
 
       /** @type IO<ArrayBuffer> */
       const zipBytes = bind(
         filename,
         filename2arrayBuffer,
-      )
+      );
 
       /** @type IO<ZipArchiveInfo> */
       const zinfo = bind(
         zipBytes,
         buf2zip,
-      )
+      );
 
       /** @type IO<Void> */
-      const zinfo2console = bind(zinfo, zip2console)
+      const zinfo2console = bind(zinfo, zip2console);
 
-      return zinfo2console()
-    })
-}
+      return zinfo2console();
+    });
+};
 
-main()
+main();

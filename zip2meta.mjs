@@ -14,8 +14,8 @@
 export function bind(io, mapper) {
   return () => {
     return io()
-      .then((t) => mapper(t)())
-  }
+      .then((t) => mapper(t)());
+  };
 }
 
 /**
@@ -28,9 +28,9 @@ export function bind(io, mapper) {
 export function lift(pure) {
   return (t) => {
     return () => {
-      return pure(t)
-    }
-  }
+      return pure(t);
+    };
+  };
 }
 
 /**
@@ -40,7 +40,7 @@ export function lift(pure) {
  * @returns {IO<T>} The wrapped value.
  */
 export function of(t) {
-  return () => Promise.resolve(t)
+  return () => Promise.resolve(t);
 }
 
 /**
@@ -52,7 +52,7 @@ export const ZipMethod = Object.freeze({
   UNSPECIFIED: 0,
   STORE: 1,
   DEFLATE: 2,
-})
+});
 
 /**
  * URL.
@@ -81,7 +81,7 @@ export const ZipMethod = Object.freeze({
  * @returns {string} The converted JSON string.
  */
 function zipitem2json(zitem) {
-  return JSON.stringify(zitem)
+  return JSON.stringify(zitem);
 }
 
 /**
@@ -108,9 +108,9 @@ const zitem2console = (zitem) => {
     /** @type string */
     return Promise.resolve(zitem)
       .then(zipitem2json)
-      .then(console.info)
-  }
-}
+      .then(console.info);
+  };
+};
 
 /**
  * Zip archive info printer.
@@ -126,18 +126,18 @@ function zaWriterNew(ziwriter) {
   return (za) => {
     return () => {
       /** @type ZipItemInfo[] */
-      const items = za.items
+      const items = za.items;
 
       /** @type Promise<Void>[] */
       const mapd = items.map((zitem) => {
-        return ziwriter(zitem)()
-      })
+        return ziwriter(zitem)();
+      });
 
       return Promise.all(mapd)
-        .then((_) => undefined)
-    }
-  }
+        .then((_) => undefined);
+    };
+  };
 }
 
 /** @type ZipArchiveInfoWriter */
-export const zip2console = zaWriterNew(zitem2console)
+export const zip2console = zaWriterNew(zitem2console);
