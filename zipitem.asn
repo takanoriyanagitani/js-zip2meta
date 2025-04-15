@@ -1,0 +1,24 @@
+ZipItem DEFINITIONS ::= BEGIN
+
+  CompressionMethod ::= ENUMERATED {
+    unspecified (0),
+    store       (1),
+    deflate     (2)
+  }
+
+  SimpleItem ::= SEQUENCE {
+    name             UTF8String,
+    comment          UTF8String,
+    modifiedUnixtime INTEGER,
+    size             INTEGER,
+    method           CompressionMethod,
+    isDir            BOOLEAN
+  }
+
+  ZipFileInfo ::= SEQUENCE {
+    comment UTF8String,
+    filepath UTF8String,
+    items SEQUENCE OF SimpleItem
+  }
+
+END
